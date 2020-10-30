@@ -1,0 +1,17 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+  build:
+    commands:
+      - cd $CODEBUILD_SRC_DIR/app
+      - echo "Installing TfL Data Services"
+      - npm install --production
+      - cd $CODEBUILD_SRC_DIR
+      - aws cloudformation package --template-file template.yaml --s3-bucket tfl-data --output-template-file output-template.yaml
+artifacts:
+  type: zip
+  files:
+    - template.yaml
+    - output-template.yaml
