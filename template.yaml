@@ -1,0 +1,46 @@
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Tube Data Poller
+Resources:
+  TfLDataPoller:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: app/
+      Handler: index.poll
+      Runtime: nodejs12.x
+      Environment:
+        Variables:
+          TABLE_NAME: data
+      Events:
+        Poll:
+          Type: Api
+          Properties:
+            Path: /poll
+            Method: get
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TfLDataTable
+  TfLDataFetcher:
+    Type: AWS::Serverless:Function
+    Properties:
+      CodeUri: app/
+      Handler: index.fetch
+      Runtime: nodejs12.x
+      Environment:
+        Variables:
+          TABLE_NAME: data
+      Events:
+        Fetch:
+          Type: Api
+          Properties:
+            Path: /fetch
+            Method: get
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TfLDataTable
+  TfLDataTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: timestamp
+        Type: String
+      TableName: TfLData
